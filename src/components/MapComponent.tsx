@@ -149,31 +149,33 @@ const MapComponent = ({ onMarkerClick }: MapComponentProps) => {
         {locations.map((loc, idx) => (
           <Marker key={`place-${idx}`} position={loc.pos} icon={customIcon}>
             <Popup className="custom-popup">
-              <Card className="border-0 shadow-none p-3 min-w-[200px]">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-gradient-to-br from-primary to-secondary rounded-lg">
-                    <Icon name="MapPin" size={20} className="text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-base mb-1">{loc.name}</h3>
-                    <p className="text-sm text-gray-600 mb-2">{loc.description}</p>
-                    <div className="flex items-center gap-2 mb-3">
-                      <Badge className="bg-green-500 text-xs">
-                        <Icon name="Users" size={12} className="mr-1" />
-                        {loc.visitors}
-                      </Badge>
+              {(close) => (
+                <Card className="border-0 shadow-none p-3 min-w-[200px]">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-gradient-to-br from-primary to-secondary rounded-lg">
+                      <Icon name="MapPin" size={20} className="text-white" />
                     </div>
-                    <Button 
-                      size="sm" 
-                      className="w-full bg-gradient-to-r from-primary to-secondary"
-                      onClick={() => onMarkerClick?.('place', loc)}
-                    >
-                      <Icon name="Eye" size={14} className="mr-1" />
-                      Посмотреть
-                    </Button>
+                    <div className="flex-1">
+                      <h3 className="font-bold text-base mb-1">{loc.name}</h3>
+                      <p className="text-sm text-gray-600 mb-2">{loc.description}</p>
+                      <div className="flex items-center gap-2 mb-3">
+                        <Badge className="bg-green-500 text-xs">
+                          <Icon name="Users" size={12} className="mr-1" />
+                          {loc.visitors}
+                        </Badge>
+                      </div>
+                      <Button 
+                        size="sm" 
+                        className="w-full bg-gradient-to-r from-primary to-secondary"
+                        onClick={() => onMarkerClick?.('place', loc)}
+                      >
+                        <Icon name="Eye" size={14} className="mr-1" />
+                        Посмотреть
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </Card>
+                </Card>
+              )}
             </Popup>
           </Marker>
         ))}
@@ -181,27 +183,29 @@ const MapComponent = ({ onMarkerClick }: MapComponentProps) => {
         {cameras.map((cam, idx) => (
           <Marker key={`camera-${idx}`} position={cam.pos} icon={cameraIcon}>
             <Popup className="custom-popup">
-              <Card className="border-0 shadow-none p-3 min-w-[180px]">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-gradient-to-br from-accent to-orange-500 rounded-lg">
-                    <Icon name="Video" size={20} className="text-white" />
+              {(close) => (
+                <Card className="border-0 shadow-none p-3 min-w-[180px]">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-gradient-to-br from-accent to-orange-500 rounded-lg">
+                      <Icon name="Video" size={20} className="text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-bold text-base mb-1">{cam.name}</h3>
+                      <Badge className="bg-red-500 text-xs mb-3 animate-pulse">
+                        LIVE
+                      </Badge>
+                      <Button 
+                        size="sm" 
+                        className="w-full bg-gradient-to-r from-accent to-orange-500"
+                        onClick={() => onMarkerClick?.('camera', cam)}
+                      >
+                        <Icon name="Play" size={14} className="mr-1" />
+                        Смотреть
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-base mb-1">{cam.name}</h3>
-                    <Badge className="bg-red-500 text-xs mb-3 animate-pulse">
-                      LIVE
-                    </Badge>
-                    <Button 
-                      size="sm" 
-                      className="w-full bg-gradient-to-r from-accent to-orange-500"
-                      onClick={() => onMarkerClick?.('camera', cam)}
-                    >
-                      <Icon name="Play" size={14} className="mr-1" />
-                      Смотреть
-                    </Button>
-                  </div>
-                </div>
-              </Card>
+                </Card>
+              )}
             </Popup>
           </Marker>
         ))}
@@ -209,27 +213,29 @@ const MapComponent = ({ onMarkerClick }: MapComponentProps) => {
         {friends.map((friend, idx) => (
           <Marker key={`friend-${idx}`} position={friend.pos} icon={friendIcon}>
             <Popup className="custom-popup">
-              <Card className="border-0 shadow-none p-3 min-w-[180px]">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-gradient-to-br from-secondary to-green-600 rounded-lg">
-                    <Icon name="User" size={20} className="text-white" />
+              {(close) => (
+                <Card className="border-0 shadow-none p-3 min-w-[180px]">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-gradient-to-br from-secondary to-green-600 rounded-lg">
+                      <Icon name="User" size={20} className="text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-bold text-base mb-1">{friend.name}</h3>
+                      <Badge className="bg-green-500 text-xs mb-3">
+                        {friend.status}
+                      </Badge>
+                      <Button 
+                        size="sm" 
+                        className="w-full bg-gradient-to-r from-secondary to-green-600"
+                        onClick={() => onMarkerClick?.('friend', friend)}
+                      >
+                        <Icon name="MessageCircle" size={14} className="mr-1" />
+                        Написать
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-base mb-1">{friend.name}</h3>
-                    <Badge className="bg-green-500 text-xs mb-3">
-                      {friend.status}
-                    </Badge>
-                    <Button 
-                      size="sm" 
-                      className="w-full bg-gradient-to-r from-secondary to-green-600"
-                      onClick={() => onMarkerClick?.('friend', friend)}
-                    >
-                      <Icon name="MessageCircle" size={14} className="mr-1" />
-                      Написать
-                    </Button>
-                  </div>
-                </div>
-              </Card>
+                </Card>
+              )}
             </Popup>
           </Marker>
         ))}

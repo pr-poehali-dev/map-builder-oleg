@@ -41,32 +41,49 @@ interface Profile {
   friends: Friend[];
 }
 
-const Index = () => {
+interface IndexProps {
+  user?: any;
+}
+
+const Index = ({ user }: IndexProps) => {
   const { toast } = useToast();
   const [activeSection, setActiveSection] = useState<Section>("map");
   const [searchQuery, setSearchQuery] = useState("");
   const [isVoiceActive, setIsVoiceActive] = useState(false);
   const [profile, setProfile] = useState<Profile>({
-    name: "Ваш профиль",
-    email: "vk@vetkarty.ru",
-    initials: "ВК",
+    name: user?.name || "Ваш профиль",
+    email: user?.email || "vk@vetkarty.ru",
+    initials: user?.initials || "ВК",
     friends: []
   });
   const [isAddFriendOpen, setIsAddFriendOpen] = useState(false);
   const [newFriendName, setNewFriendName] = useState("");
   const [newFriendPhone, setNewFriendPhone] = useState("");
   const [newFriendLocation, setNewFriendLocation] = useState("");
+  const [isHotlineOpen, setIsHotlineOpen] = useState(false);
 
   useEffect(() => {
+    if (user) {
+      setProfile(prev => ({
+        ...prev,
+        name: user.name,
+        email: user.email,
+        initials: user.initials
+      }));
+    }
     const savedProfile = localStorage.getItem('vetkarty_profile');
     if (savedProfile) {
       try {
-        setProfile(JSON.parse(savedProfile));
+        const saved = JSON.parse(savedProfile);
+        setProfile(prev => ({
+          ...prev,
+          friends: saved.friends || []
+        }));
       } catch (error) {
         console.error('Ошибка загрузки профиля:', error);
       }
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     localStorage.setItem('vetkarty_profile', JSON.stringify(profile));
@@ -525,6 +542,107 @@ const Index = () => {
                 className="pl-10 w-64 bg-gray-50"
               />
             </div>
+            <Dialog open={isHotlineOpen} onOpenChange={setIsHotlineOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white font-semibold gap-2">
+                  <Icon name="Phone" size={18} />
+                  Горячая линия
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl flex items-center gap-2">
+                    <Icon name="Phone" size={28} className="text-red-500" />
+                    Горячая линия поддержки
+                  </DialogTitle>
+                  <DialogDescription>
+                    Свяжитесь с нами любым удобным способом - мы всегда на связи!
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 mt-4">
+                  <Card className="p-6 bg-gradient-to-br from-red-50 to-orange-50 border-red-200">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="p-4 bg-red-500 rounded-full">
+                        <Icon name="Phone" size={32} className="text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-xl">Круглосуточная поддержка</h3>
+                        <p className="text-gray-600">Работаем 24/7 без выходных</p>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <a href="tel:88005553535" className="flex items-center gap-3 p-3 bg-white rounded-lg hover:shadow-md transition-all">
+                        <Icon name="Phone" size={20} className="text-red-500" />
+                        <div>
+                          <p className="font-semibold">8 (800) 555-35-35</p>
+                          <p className="text-sm text-gray-600">Звонок бесплатный</p>
+                        </div>
+                      </a>
+                      <a href="mailto:support@vetkarty.ru" className="flex items-center gap-3 p-3 bg-white rounded-lg hover:shadow-md transition-all">
+                        <Icon name="Mail" size={20} className="text-blue-500" />
+                        <div>
+                          <p className="font-semibold">support@vetkarty.ru</p>
+                          <p className="text-sm text-gray-600">Ответим в течение часа</p>
+                        </div>
+                      </a>
+                      <a href="https://t.me/vetkarty_support" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 bg-white rounded-lg hover:shadow-md transition-all">
+                        <Icon name="MessageCircle" size={20} className="text-blue-400" />
+                        <div>
+                          <p className="font-semibold">@vetkarty_support</p>
+                          <p className="text-sm text-gray-600">Telegram чат поддержки</p>
+                        </div>
+                      </a>
+                      <a href="https://wa.me/79991234567" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 bg-white rounded-lg hover:shadow-md transition-all">
+                        <Icon name="MessageSquare" size={20} className="text-green-500" />
+                        <div>
+                          <p className="font-semibold">+7 (999) 123-45-67</p>
+                          <p className="text-sm text-gray-600">WhatsApp поддержка</p>
+                        </div>
+                      </a>
+                    </div>
+                  </Card>
+
+                  <div className="grid grid-cols-3 gap-3">
+                    <Card className="p-4 text-center hover:shadow-lg transition-all">
+                      <Icon name="Clock" size={32} className="mx-auto mb-2 text-primary" />
+                      <p className="font-semibold">24/7</p>
+                      <p className="text-xs text-gray-600">Поддержка</p>
+                    </Card>
+                    <Card className="p-4 text-center hover:shadow-lg transition-all">
+                      <Icon name="Users" size={32} className="mx-auto mb-2 text-secondary" />
+                      <p className="font-semibold">50+</p>
+                      <p className="text-xs text-gray-600">Операторов</p>
+                    </Card>
+                    <Card className="p-4 text-center hover:shadow-lg transition-all">
+                      <Icon name="Zap" size={32} className="mx-auto mb-2 text-accent" />
+                      <p className="font-semibold">2 мин</p>
+                      <p className="text-xs text-gray-600">Отклик</p>
+                    </Card>
+                  </div>
+
+                  <Card className="p-4 bg-blue-50 border-blue-200">
+                    <h4 className="font-semibold mb-2 flex items-center gap-2">
+                      <Icon name="Info" size={18} className="text-blue-500" />
+                      Популярные вопросы
+                    </h4>
+                    <ul className="space-y-2 text-sm">
+                      <li className="flex items-start gap-2">
+                        <Icon name="Check" size={16} className="text-green-500 mt-0.5" />
+                        <span>Как добавить друга на карту?</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Icon name="Check" size={16} className="text-green-500 mt-0.5" />
+                        <span>Как построить маршрут между городами?</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Icon name="Check" size={16} className="text-green-500 mt-0.5" />
+                        <span>Как подключить камеры наблюдения?</span>
+                      </li>
+                    </ul>
+                  </Card>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
 
           <Sheet>
