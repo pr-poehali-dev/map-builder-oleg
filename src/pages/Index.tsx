@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -63,13 +63,13 @@ const Index = ({ user }: IndexProps) => {
   const [isHotlineOpen, setIsHotlineOpen] = useState(false);
   const [selectedCity, setSelectedCity] = useState("moscow");
 
-  const cities = [
+  const cities = useMemo(() => [
     { id: "moscow", name: "Москва", icon: "Building" },
     { id: "spb", name: "Санкт-Петербург", icon: "Landmark" },
     { id: "kazan", name: "Казань", icon: "Church" },
     { id: "sochi", name: "Сочи", icon: "Palmtree" },
     { id: "ekb", name: "Екатеринбург", icon: "Mountain" },
-  ];
+  ], []);
 
   useEffect(() => {
     if (user) {
@@ -107,9 +107,9 @@ const Index = ({ user }: IndexProps) => {
     { id: "profile" as Section, label: "Профиль", icon: "User" },
   ];
 
-  const handleMarkerClick = (type: string, data: any) => {
+  const handleMarkerClick = useCallback((type: string, data: any) => {
     console.log('Clicked:', type, data);
-  };
+  }, []);
 
   const renderMapSection = () => (
     <div className="relative w-full h-[calc(100vh-12rem)]">
