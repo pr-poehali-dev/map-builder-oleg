@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import Icon from "@/components/ui/icon";
+import MapComponent from "@/components/MapComponent";
 import {
   Sheet,
   SheetContent,
@@ -29,31 +30,16 @@ const Index = () => {
     { id: "profile" as Section, label: "Профиль", icon: "User" },
   ];
 
-  const renderMapSection = () => (
-    <div className="relative w-full h-full bg-gradient-to-br from-blue-50 via-green-50 to-orange-50 rounded-2xl overflow-hidden">
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="text-center space-y-4 animate-fade-in">
-          <div className="relative inline-block">
-            <Icon name="MapPin" size={80} className="text-primary animate-pulse-slow" />
-            <div className="absolute -top-2 -right-2 w-6 h-6 bg-secondary rounded-full animate-ping"></div>
-          </div>
-          <h3 className="text-2xl font-bold text-gray-700">Интерактивная карта</h3>
-          <p className="text-gray-600">Москва и Санкт-Петербург</p>
-          <div className="flex gap-3 justify-center mt-4">
-            <Button className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-all">
-              <Icon name="Navigation" size={18} className="mr-2" />
-              Построить маршрут
-            </Button>
-            <Button variant="outline" className="border-2 hover:scale-105 transition-transform">
-              <Icon name="Search" size={18} className="mr-2" />
-              Поиск места
-            </Button>
-          </div>
-        </div>
-      </div>
+  const handleMarkerClick = (type: string, data: any) => {
+    console.log('Clicked:', type, data);
+  };
 
-      <div className="absolute top-4 left-4 space-y-3">
-        <Card className="p-3 backdrop-blur-sm bg-white/90 shadow-lg animate-slide-in">
+  const renderMapSection = () => (
+    <div className="relative w-full h-[calc(100vh-12rem)]">
+      <MapComponent onMarkerClick={handleMarkerClick} />
+      
+      <div className="absolute top-4 left-4 space-y-3 z-[1000] pointer-events-auto">
+        <Card className="p-3 backdrop-blur-sm bg-white/95 shadow-lg animate-slide-in">
           <div className="flex items-center gap-2 mb-2">
             <Icon name="MapPin" size={20} className="text-primary" />
             <span className="font-semibold text-sm">Москва</span>
@@ -64,7 +50,7 @@ const Index = () => {
           </div>
         </Card>
 
-        <Card className="p-3 backdrop-blur-sm bg-white/90 shadow-lg animate-slide-in" style={{animationDelay: '0.1s'}}>
+        <Card className="p-3 backdrop-blur-sm bg-white/95 shadow-lg animate-slide-in" style={{animationDelay: '0.1s'}}>
           <div className="flex items-center gap-2 mb-2">
             <Icon name="Video" size={20} className="text-secondary" />
             <span className="font-semibold text-sm">12 камер</span>
@@ -73,7 +59,7 @@ const Index = () => {
         </Card>
       </div>
 
-      <div className="absolute bottom-4 right-4">
+      <div className="absolute bottom-4 right-4 z-[1000]">
         <Button 
           size="lg"
           className="rounded-full h-16 w-16 bg-gradient-to-r from-accent to-orange-500 shadow-2xl hover:scale-110 transition-all"
