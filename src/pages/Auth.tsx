@@ -249,6 +249,7 @@ const Auth = ({ onComplete }: AuthProps) => {
 
           <div className="text-center">
             <button
+              type="button"
               onClick={() => setStep(step === "login" ? "register" : "login")}
               className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
             >
