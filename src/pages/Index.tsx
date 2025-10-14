@@ -72,7 +72,21 @@ const Index = ({ user }: IndexProps) => {
   ], []);
 
   useEffect(() => {
-    if (user) {
+    const savedProfile = localStorage.getItem('vetkarty_profile');
+    if (savedProfile) {
+      try {
+        const saved = JSON.parse(savedProfile);
+        setProfile(prev => ({
+          ...prev,
+          name: user?.name || prev.name,
+          email: user?.email || prev.email,
+          initials: user?.initials || prev.initials,
+          friends: saved.friends || []
+        }));
+      } catch (error) {
+        console.error('Ошибка загрузки профиля:', error);
+      }
+    } else if (user) {
       setProfile(prev => ({
         ...prev,
         name: user.name,
@@ -80,23 +94,11 @@ const Index = ({ user }: IndexProps) => {
         initials: user.initials
       }));
     }
-    const savedProfile = localStorage.getItem('vetkarty_profile');
-    if (savedProfile) {
-      try {
-        const saved = JSON.parse(savedProfile);
-        setProfile(prev => ({
-          ...prev,
-          friends: saved.friends || []
-        }));
-      } catch (error) {
-        console.error('Ошибка загрузки профиля:', error);
-      }
-    }
-  }, [user]);
+  }, []);
 
   useEffect(() => {
-    localStorage.setItem('vetkarty_profile', JSON.stringify(profile));
-  }, [profile]);
+    localStorage.setItem('vetkarty_profile', JSON.stringify({ friends: profile.friends }));
+  }, [profile.friends]);
 
   const menuItems = [
     { id: "map" as Section, label: "Карта", icon: "Map" },
