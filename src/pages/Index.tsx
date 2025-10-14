@@ -84,7 +84,7 @@ const Index = ({ user }: IndexProps) => {
           friends: saved.friends || []
         }));
       } catch (error) {
-        console.error('Ошибка загрузки профиля:', error);
+        // Ошибка загрузки профиля
       }
     } else if (user) {
       setProfile(prev => ({
@@ -110,8 +110,23 @@ const Index = ({ user }: IndexProps) => {
   ];
 
   const handleMarkerClick = useCallback((type: string, data: any) => {
-    console.log('Clicked:', type, data);
-  }, []);
+    if (type === 'place') {
+      toast({
+        title: data.name,
+        description: `${data.description} • Посетителей: ${data.visitors}`
+      });
+    } else if (type === 'camera') {
+      toast({
+        title: "Трансляция камеры",
+        description: `Открываю ${data.name}...`
+      });
+    } else if (type === 'friend') {
+      toast({
+        title: data.name,
+        description: "Открываю чат..."
+      });
+    }
+  }, [toast]);
 
   const renderMapSection = () => (
     <div className="relative w-full h-[calc(100vh-12rem)]">
@@ -154,9 +169,47 @@ const Index = ({ user }: IndexProps) => {
           </div>
           <p className="text-xs text-gray-600">в пределах 5 км</p>
         </Card>
+
+        {profile.friends.length > 0 && (
+          <Card className="p-3 backdrop-blur-sm bg-white/95 shadow-lg animate-slide-in cursor-pointer hover:shadow-xl transition-all" 
+                style={{animationDelay: '0.2s'}}
+                onClick={() => setActiveSection("friends")}>
+            <div className="flex items-center gap-2 mb-2">
+              <div className="relative">
+                <Icon name="Users" size={20} className="text-green-600" />
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+              </div>
+              <span className="font-semibold text-sm">Друзья рядом</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Avatar className="h-6 w-6 border-2 border-white -ml-0">
+                <AvatarFallback className="text-xs bg-gradient-to-br from-primary to-secondary text-white">
+                  {profile.friends[0]?.name[0] || 'F'}
+                </AvatarFallback>
+              </Avatar>
+              {profile.friends.length > 1 && (
+                <Avatar className="h-6 w-6 border-2 border-white -ml-2">
+                  <AvatarFallback className="text-xs bg-gradient-to-br from-secondary to-green-600 text-white">
+                    {profile.friends[1]?.name[0] || 'F'}
+                  </AvatarFallback>
+                </Avatar>
+              )}
+              {profile.friends.length > 2 && (
+                <div className="ml-1 text-xs text-gray-600 font-medium">+{profile.friends.length - 2}</div>
+              )}
+            </div>
+          </Card>
+        )}
       </div>
 
-      <div className="absolute bottom-4 right-4 z-[1000]">
+      <div className="absolute bottom-4 right-4 z-[1000] flex flex-col gap-3">
+        <Button 
+          size="lg"
+          className="rounded-full h-16 w-16 bg-gradient-to-r from-red-500 to-orange-600 shadow-2xl hover:scale-110 transition-all animate-pulse"
+          onClick={() => toast({ title: "SOS", description: "Экстренный вызов активирован", variant: "destructive" })}
+        >
+          <Icon name="AlertCircle" size={28} />
+        </Button>
         <Button 
           size="lg"
           className="rounded-full h-16 w-16 bg-gradient-to-r from-accent to-orange-500 shadow-2xl hover:scale-110 transition-all"
@@ -168,30 +221,91 @@ const Index = ({ user }: IndexProps) => {
     </div>
   );
 
-  const renderCamerasSection = () => (
-    <div className="space-y-4 animate-fade-in">
-      <h2 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-        Камеры наблюдения
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {[1, 2, 3, 4, 5, 6].map((i) => (
-          <Card key={i} className="overflow-hidden hover:shadow-xl transition-all hover:scale-105">
-            <div className="h-40 bg-gradient-to-br from-blue-400 to-purple-400 flex items-center justify-center relative">
-              <Icon name="Video" size={48} className="text-white opacity-50" />
-              <Badge className="absolute top-2 right-2 bg-red-500 animate-pulse">LIVE</Badge>
+  const renderCamerasSection = () => {
+    const cameras = [
+      { id: 1, name: "Красная площадь", location: "Москва, центр", status: "online", viewers: 1234 },
+      { id: 2, name: "Невский проспект", location: "Санкт-Петербург", status: "online", viewers: 892 },
+      { id: 3, name: "Казанский Кремль", location: "Казань", status: "online", viewers: 456 },
+      { id: 4, name: "Олимпийский парк", location: "Сочи", status: "offline", viewers: 0 },
+      { id: 5, name: "Плотинка", location: "Екатеринбург", status: "online", viewers: 678 },
+      { id: 6, name: "Набережная", location: "Москва", status: "online", viewers: 2341 },
+    ];
+
+    return (
+      <div className="space-y-4 animate-fade-in">
+        <div className="flex justify-between items-center">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            Камеры наблюдения
+          </h2>
+          <div className="flex gap-2">
+            <Badge className="bg-green-500">Онлайн: {cameras.filter(c => c.status === 'online').length}</Badge>
+            <Badge variant="outline">Всего: {cameras.length}</Badge>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {cameras.map((camera) => (
+            <Card key={camera.id} className="overflow-hidden hover:shadow-xl transition-all hover:scale-105 cursor-pointer">
+              <div className="h-40 bg-gradient-to-br from-blue-400 via-purple-400 to-pink-400 flex items-center justify-center relative group">
+                <Icon name="Video" size={48} className="text-white opacity-50 group-hover:opacity-100 transition-opacity" />
+                {camera.status === 'online' ? (
+                  <>
+                    <Badge className="absolute top-2 right-2 bg-red-500 animate-pulse flex items-center gap-1">
+                      <div className="w-2 h-2 rounded-full bg-white"></div>
+                      LIVE
+                    </Badge>
+                    <div className="absolute bottom-2 right-2 bg-black/70 px-2 py-1 rounded text-white text-xs flex items-center gap-1">
+                      <Icon name="Eye" size={12} />
+                      {camera.viewers}
+                    </div>
+                  </>
+                ) : (
+                  <Badge className="absolute top-2 right-2 bg-gray-500">Оффлайн</Badge>
+                )}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                  <Button size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity bg-white text-black hover:bg-white/90">
+                    <Icon name="Play" size={16} className="mr-1" />
+                    Смотреть
+                  </Button>
+                </div>
+              </div>
+              <div className="p-4">
+                <h3 className="font-semibold mb-1">{camera.name}</h3>
+                <p className="text-sm text-gray-600 flex items-center gap-1">
+                  <Icon name="MapPin" size={14} />
+                  {camera.location}
+                </p>
+              </div>
+            </Card>
+          ))}
+        </div>
+
+        <Card className="p-6 mt-6 bg-gradient-to-br from-blue-50 to-purple-50">
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-gradient-to-br from-primary to-secondary rounded-full">
+              <Icon name="Info" size={24} className="text-white" />
             </div>
-            <div className="p-4">
-              <h3 className="font-semibold mb-1">Камера #{i}</h3>
-              <p className="text-sm text-gray-600 flex items-center gap-1">
-                <Icon name="MapPin" size={14} />
-                Москва, центр
+            <div>
+              <h3 className="font-bold text-lg mb-2">О камерах наблюдения</h3>
+              <p className="text-gray-600 text-sm mb-3">
+                Все камеры работают в режиме реального времени и помогают отслеживать обстановку в ключевых точках городов.
               </p>
+              <div className="flex gap-2">
+                <Button size="sm" variant="outline">
+                  <Icon name="Bell" size={16} className="mr-1" />
+                  Настроить уведомления
+                </Button>
+                <Button size="sm" variant="outline">
+                  <Icon name="Download" size={16} className="mr-1" />
+                  Записи
+                </Button>
+              </div>
             </div>
-          </Card>
-        ))}
+          </div>
+        </Card>
       </div>
-    </div>
-  );
+    );
+  };
 
   const handleAddFriend = () => {
     if (!newFriendName.trim() || !newFriendPhone.trim()) {
@@ -351,52 +465,93 @@ const Index = ({ user }: IndexProps) => {
     </div>
   );
 
-  const renderRoutesSection = () => (
-    <div className="space-y-4 animate-fade-in">
-      <h2 className="text-3xl font-bold bg-gradient-to-r from-accent to-orange-600 bg-clip-text text-transparent">
-        Маршруты
-      </h2>
-      <Card className="p-6 bg-gradient-to-br from-blue-50 to-purple-50">
-        <div className="space-y-4">
-          <div>
-            <label className="text-sm font-medium mb-2 block">Откуда</label>
-            <Input placeholder="Введите адрес отправления" className="bg-white" />
+  const renderRoutesSection = () => {
+    const savedRoutes = [
+      { from: "Красная площадь", to: "Парк Горького", time: "15 мин", distance: "4.2 км", transport: "walk" },
+      { from: "Невский проспект", to: "Эрмитаж", time: "12 мин", distance: "2.8 км", transport: "walk" },
+      { from: "Казанский Кремль", to: "Улица Баумана", time: "8 мин", distance: "1.5 км", transport: "car" },
+      { from: "Олимпийский парк", to: "Роза Хутор", time: "45 мин", distance: "38 км", transport: "car" },
+    ];
+
+    return (
+      <div className="space-y-4 animate-fade-in">
+        <h2 className="text-3xl font-bold bg-gradient-to-r from-accent to-orange-600 bg-clip-text text-transparent">
+          Маршруты
+        </h2>
+        
+        <Card className="p-6 bg-gradient-to-br from-blue-50 to-purple-50">
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block flex items-center gap-2">
+                <Icon name="MapPin" size={16} className="text-green-600" />
+                Откуда
+              </label>
+              <Input placeholder="Введите адрес отправления" className="bg-white" />
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-2 block flex items-center gap-2">
+                <Icon name="Flag" size={16} className="text-red-600" />
+                Куда
+              </label>
+              <Input placeholder="Введите адрес назначения" className="bg-white" />
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <Button variant="outline" className="h-20 flex-col">
+                <Icon name="PersonStanding" size={24} className="mb-1" />
+                <span className="text-xs">Пешком</span>
+              </Button>
+              <Button variant="outline" className="h-20 flex-col">
+                <Icon name="Car" size={24} className="mb-1" />
+                <span className="text-xs">Авто</span>
+              </Button>
+              <Button variant="outline" className="h-20 flex-col">
+                <Icon name="Bus" size={24} className="mb-1" />
+                <span className="text-xs">Общ. транспорт</span>
+              </Button>
+            </div>
+            <Button className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 h-12">
+              <Icon name="Navigation" size={20} className="mr-2" />
+              Построить маршрут
+            </Button>
           </div>
-          <div>
-            <label className="text-sm font-medium mb-2 block">Куда</label>
-            <Input placeholder="Введите адрес назначения" className="bg-white" />
-          </div>
-          <Button className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 h-12">
-            <Icon name="Navigation" size={20} className="mr-2" />
-            Построить маршрут
-          </Button>
+        </Card>
+
+        <div className="flex justify-between items-center mt-6">
+          <h3 className="text-xl font-bold">Сохраненные маршруты</h3>
+          <Badge>Всего: {savedRoutes.length}</Badge>
         </div>
-      </Card>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-        {[
-          { from: "Красная площадь", to: "Парк Горького", time: "15 мин", distance: "4.2 км" },
-          { from: "Невский проспект", to: "Эрмитаж", time: "12 мин", distance: "2.8 км" },
-        ].map((route, i) => (
-          <Card key={i} className="p-4 hover:shadow-lg transition-all">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {savedRoutes.map((route, i) => (
+            <Card key={i} className="p-4 hover:shadow-lg transition-all cursor-pointer hover:scale-102">
             <div className="flex items-start gap-3">
               <div className="p-3 bg-gradient-to-br from-primary to-secondary rounded-full">
-                <Icon name="Route" size={20} className="text-white" />
+                <Icon name={route.transport === 'walk' ? 'PersonStanding' : route.transport === 'car' ? 'Car' : 'Bus'} size={20} className="text-white" />
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <Icon name="MapPin" size={14} className="text-primary" />
+                  <Icon name="MapPin" size={14} className="text-green-600" />
                   <span className="text-sm font-medium">{route.from}</span>
                 </div>
-                <div className="flex items-center gap-2 mb-2">
-                  <Icon name="Flag" size={14} className="text-secondary" />
+                <div className="flex items-center gap-2 mb-3">
+                  <Icon name="Flag" size={14} className="text-red-600" />
                   <span className="text-sm font-medium">{route.to}</span>
                 </div>
-                <div className="flex gap-4 text-xs text-gray-600">
-                  <span className="flex items-center gap-1">
-                    <Icon name="Clock" size={12} />
-                    {route.time}
-                  </span>
-                  <span>{route.distance}</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex gap-3 text-xs text-gray-600">
+                    <span className="flex items-center gap-1">
+                      <Icon name="Clock" size={12} />
+                      {route.time}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Icon name="Ruler" size={12} />
+                      {route.distance}
+                    </span>
+                  </div>
+                  <Button size="sm" variant="outline" className="h-8">
+                    <Icon name="Play" size={14} className="mr-1" />
+                    Начать
+                  </Button>
                 </div>
               </div>
             </div>
@@ -444,23 +599,66 @@ const Index = ({ user }: IndexProps) => {
         )}
       </Card>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {[
-          { label: "Где я?", icon: "MapPin" },
-          { label: "Маршрут", icon: "Navigation" },
-          { label: "Камеры", icon: "Video" },
-          { label: "Друзья", icon: "Users" },
-        ].map((cmd, i) => (
-          <Button
-            key={i}
-            variant="outline"
-            className="h-20 flex-col hover:scale-105 transition-all hover:border-accent"
-          >
-            <Icon name={cmd.icon as any} size={24} className="mb-2" />
-            <span className="text-sm">{cmd.label}</span>
-          </Button>
-        ))}
+      <div>
+        <h3 className="text-lg font-bold mb-3">Быстрые команды</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[
+            { label: "Где я?", icon: "MapPin", color: "from-blue-500 to-cyan-500" },
+            { label: "Маршрут", icon: "Navigation", color: "from-green-500 to-emerald-500" },
+            { label: "Камеры", icon: "Video", color: "from-purple-500 to-pink-500" },
+            { label: "Друзья рядом", icon: "Users", color: "from-orange-500 to-red-500" },
+            { label: "Погода", icon: "CloudRain", color: "from-sky-500 to-blue-500" },
+            { label: "Пробки", icon: "Car", color: "from-red-500 to-orange-500" },
+            { label: "Заправки", icon: "Fuel", color: "from-yellow-500 to-amber-500" },
+            { label: "Помощь", icon: "LifeBuoy", color: "from-pink-500 to-rose-500" },
+          ].map((cmd, i) => (
+            <Button
+              key={i}
+              variant="outline"
+              className="h-24 flex-col hover:scale-105 transition-all hover:shadow-lg group"
+              onClick={() => toast({ title: cmd.label, description: "Функция в разработке" })}
+            >
+              <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${cmd.color} flex items-center justify-center mb-2 group-hover:scale-110 transition-transform`}>
+                <Icon name={cmd.icon as any} size={24} className="text-white" />
+              </div>
+              <span className="text-xs font-medium">{cmd.label}</span>
+            </Button>
+          ))}
+        </div>
       </div>
+
+      <Card className="p-6 bg-gradient-to-br from-green-50 to-blue-50">
+        <h3 className="font-bold text-lg mb-3 flex items-center gap-2">
+          <Icon name="Sparkles" size={20} className="text-accent" />
+          Возможности Олега
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+          <div className="flex items-start gap-2">
+            <Icon name="Check" size={16} className="text-green-600 mt-1" />
+            <span>Голосовая навигация и подсказки</span>
+          </div>
+          <div className="flex items-start gap-2">
+            <Icon name="Check" size={16} className="text-green-600 mt-1" />
+            <span>Поиск мест и построение маршрутов</span>
+          </div>
+          <div className="flex items-start gap-2">
+            <Icon name="Check" size={16} className="text-green-600 mt-1" />
+            <span>Уведомления о пробках</span>
+          </div>
+          <div className="flex items-start gap-2">
+            <Icon name="Check" size={16} className="text-green-600 mt-1" />
+            <span>Поиск друзей поблизости</span>
+          </div>
+          <div className="flex items-start gap-2">
+            <Icon name="Check" size={16} className="text-green-600 mt-1" />
+            <span>Информация о погоде</span>
+          </div>
+          <div className="flex items-start gap-2">
+            <Icon name="Check" size={16} className="text-green-600 mt-1" />
+            <span>Экстренная помощь SOS</span>
+          </div>
+        </div>
+      </Card>
     </div>
   );
 
@@ -488,21 +686,41 @@ const Index = ({ user }: IndexProps) => {
           </div>
         </div>
         <div className="grid grid-cols-3 gap-4 text-center">
-          <div className="p-4 bg-white rounded-lg">
+          <div className="p-4 bg-white rounded-lg hover:shadow-md transition-shadow cursor-pointer">
             <Icon name="Users" size={24} className="mx-auto mb-2 text-primary" />
             <p className="text-2xl font-bold">{profile.friends.length}</p>
             <p className="text-sm text-gray-600">Друзей</p>
           </div>
-          <div className="p-4 bg-white rounded-lg">
+          <div className="p-4 bg-white rounded-lg hover:shadow-md transition-shadow cursor-pointer">
             <Icon name="Route" size={24} className="mx-auto mb-2 text-secondary" />
             <p className="text-2xl font-bold">42</p>
             <p className="text-sm text-gray-600">Маршрутов</p>
           </div>
-          <div className="p-4 bg-white rounded-lg">
+          <div className="p-4 bg-white rounded-lg hover:shadow-md transition-shadow cursor-pointer">
             <Icon name="MapPin" size={24} className="mx-auto mb-2 text-accent" />
             <p className="text-2xl font-bold">89</p>
             <p className="text-sm text-gray-600">Меток</p>
           </div>
+        </div>
+      </Card>
+
+      <Card className="p-6 bg-gradient-to-br from-yellow-50 to-orange-50">
+        <h3 className="font-bold text-xl mb-4 flex items-center gap-2">
+          <Icon name="Trophy" size={24} className="text-yellow-600" />
+          Достижения
+        </h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[
+            { icon: "Star", label: "Первый друг", unlocked: true },
+            { icon: "Map", label: "10 маршрутов", unlocked: true },
+            { icon: "Camera", label: "Просмотр камер", unlocked: true },
+            { icon: "Award", label: "100 км", unlocked: false },
+          ].map((achievement, i) => (
+            <div key={i} className={`p-4 rounded-lg text-center transition-all ${achievement.unlocked ? 'bg-gradient-to-br from-yellow-400 to-orange-500 text-white' : 'bg-gray-200 opacity-50'}`}>
+              <Icon name={achievement.icon as any} size={32} className="mx-auto mb-2" />
+              <p className="text-xs font-medium">{achievement.label}</p>
+            </div>
+          ))}
         </div>
       </Card>
 
@@ -525,6 +743,17 @@ const Index = ({ user }: IndexProps) => {
             </Button>
           ))}
         </div>
+        <Button 
+          variant="destructive" 
+          className="w-full mt-4 h-12"
+          onClick={() => {
+            localStorage.removeItem('userProfile');
+            window.location.reload();
+          }}
+        >
+          <Icon name="LogOut" size={20} className="mr-2" />
+          Выйти из аккаунта
+        </Button>
       </Card>
     </div>
   );

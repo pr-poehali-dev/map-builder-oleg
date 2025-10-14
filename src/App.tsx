@@ -22,7 +22,7 @@ const App = () => {
         setUser(profile);
         setIsAuthenticated(true);
       } catch (error) {
-        console.error("Error loading profile:", error);
+        // Error loading profile
       }
     }
   }, []);
