@@ -70,7 +70,8 @@ const Auth = ({ onComplete }: AuthProps) => {
     return true;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
     if (step === "register") {
       if (!validateRegistration()) return;
       
@@ -138,7 +139,7 @@ const Auth = ({ onComplete }: AuthProps) => {
           </p>
         </div>
 
-        <div className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {step === "register" ? (
             <>
               <div className="grid grid-cols-2 gap-3">
@@ -241,8 +242,8 @@ const Auth = ({ onComplete }: AuthProps) => {
           )}
 
           <Button
+            type="submit"
             className="w-full bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white font-semibold py-6 text-lg"
-            onClick={handleSubmit}
           >
             {step === "register" ? "Зарегистрироваться" : "Войти"}
           </Button>
@@ -260,7 +261,7 @@ const Auth = ({ onComplete }: AuthProps) => {
               )}
             </button>
           </div>
-        </div>
+        </form>
       </Card>
 
       <style>{`
