@@ -61,6 +61,15 @@ const Index = ({ user }: IndexProps) => {
   const [newFriendPhone, setNewFriendPhone] = useState("");
   const [newFriendLocation, setNewFriendLocation] = useState("");
   const [isHotlineOpen, setIsHotlineOpen] = useState(false);
+  const [selectedCity, setSelectedCity] = useState("moscow");
+
+  const cities = [
+    { id: "moscow", name: "Москва", icon: "Building" },
+    { id: "spb", name: "Санкт-Петербург", icon: "Landmark" },
+    { id: "kazan", name: "Казань", icon: "Church" },
+    { id: "sochi", name: "Сочи", icon: "Palmtree" },
+    { id: "ekb", name: "Екатеринбург", icon: "Mountain" },
+  ];
 
   useEffect(() => {
     if (user) {
@@ -104,15 +113,33 @@ const Index = ({ user }: IndexProps) => {
 
   const renderMapSection = () => (
     <div className="relative w-full h-[calc(100vh-12rem)]">
-      <MapComponent onMarkerClick={handleMarkerClick} />
+      <MapComponent onMarkerClick={handleMarkerClick} city={selectedCity} />
       
       <div className="absolute top-4 left-4 space-y-3 z-[1000] pointer-events-auto">
-        <Card className="p-3 backdrop-blur-sm bg-white/95 shadow-lg animate-slide-in">
-          <div className="flex items-center gap-2 mb-2">
+        <Card className="p-4 backdrop-blur-sm bg-white/95 shadow-lg animate-slide-in">
+          <div className="flex items-center gap-2 mb-3">
             <Icon name="MapPin" size={20} className="text-primary" />
-            <span className="font-semibold text-sm">Москва</span>
+            <span className="font-semibold">Выберите город</span>
           </div>
-          <div className="flex gap-2">
+          <div className="grid grid-cols-1 gap-2">
+            {cities.map((city) => (
+              <Button
+                key={city.id}
+                variant={selectedCity === city.id ? "default" : "outline"}
+                size="sm"
+                className={`justify-start transition-all ${
+                  selectedCity === city.id 
+                    ? "bg-gradient-to-r from-primary to-secondary text-white shadow-md" 
+                    : "hover:border-primary"
+                }`}
+                onClick={() => setSelectedCity(city.id)}
+              >
+                <Icon name={city.icon as any} size={16} className="mr-2" />
+                {city.name}
+              </Button>
+            ))}
+          </div>
+          <div className="flex gap-2 mt-3">
             <Badge className="bg-green-500">Онлайн</Badge>
             <Badge variant="outline">{profile.friends.length} друзей</Badge>
           </div>

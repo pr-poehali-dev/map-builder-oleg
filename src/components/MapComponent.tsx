@@ -91,56 +91,115 @@ const MapUpdater = ({ center, zoom }: { center: [number, number]; zoom: number }
 
 interface MapComponentProps {
   onMarkerClick?: (type: string, data: any) => void;
+  city?: string;
 }
 
-const MapComponent = ({ onMarkerClick }: MapComponentProps) => {
-  const moscowCenter: [number, number] = [55.7558, 37.6173];
+const cityData: Record<string, {
+  center: [number, number];
+  zoom: number;
+  locations: Array<{ pos: [number, number]; name: string; type: string; description: string; visitors: number }>;
+  cameras: Array<{ pos: [number, number]; name: string; status: string }>;
+  friends: Array<{ pos: [number, number]; name: string; status: string }>;
+}> = {
+  moscow: {
+    center: [55.7558, 37.6173],
+    zoom: 13,
+    locations: [
+      { pos: [55.7539, 37.6208], name: 'Красная площадь', type: 'place', description: 'Главная площадь Москвы', visitors: 1234 },
+      { pos: [55.7558, 37.6173], name: 'ГУМ', type: 'place', description: 'Торговый центр', visitors: 892 },
+      { pos: [55.7520, 37.6175], name: 'Кремль', type: 'place', description: 'Исторический комплекс', visitors: 2341 },
+    ],
+    cameras: [
+      { pos: [55.7540, 37.6200], name: 'Камера #1', status: 'online' },
+      { pos: [55.7565, 37.6180], name: 'Камера #2', status: 'online' },
+      { pos: [55.7530, 37.6190], name: 'Камера #3', status: 'online' },
+    ],
+    friends: [
+      { pos: [55.7550, 37.6210], name: 'Анна Иванова', status: 'онлайн' },
+      { pos: [55.7545, 37.6165], name: 'Петр Смирнов', status: 'онлайн' },
+    ]
+  },
+  spb: {
+    center: [59.9343, 30.3351],
+    zoom: 13,
+    locations: [
+      { pos: [59.9398, 30.3146], name: 'Эрмитаж', type: 'place', description: 'Главный музей', visitors: 3456 },
+      { pos: [59.9343, 30.3351], name: 'Невский проспект', type: 'place', description: 'Главная улица СПб', visitors: 2890 },
+      { pos: [59.9571, 30.3078], name: 'Петропавловская крепость', type: 'place', description: 'Историческая крепость', visitors: 1567 },
+    ],
+    cameras: [
+      { pos: [59.9400, 30.3150], name: 'Камера СПб #1', status: 'online' },
+      { pos: [59.9350, 30.3360], name: 'Камера СПб #2', status: 'online' },
+    ],
+    friends: [
+      { pos: [59.9380, 30.3200], name: 'Мария Петрова', status: 'онлайн' },
+    ]
+  },
+  kazan: {
+    center: [55.7887, 49.1221],
+    zoom: 13,
+    locations: [
+      { pos: [55.7981, 49.1067], name: 'Казанский Кремль', type: 'place', description: 'Древняя крепость', visitors: 1890 },
+      { pos: [55.7887, 49.1221], name: 'Улица Баумана', type: 'place', description: 'Пешеходная улица', visitors: 1456 },
+      { pos: [55.7950, 49.1110], name: 'Мечеть Кул Шариф', type: 'place', description: 'Главная мечеть', visitors: 2123 },
+    ],
+    cameras: [
+      { pos: [55.7990, 49.1070], name: 'Камера Казань #1', status: 'online' },
+      { pos: [55.7900, 49.1230], name: 'Камера Казань #2', status: 'online' },
+    ],
+    friends: [
+      { pos: [55.7920, 49.1150], name: 'Рустам Валеев', status: 'онлайн' },
+    ]
+  },
+  sochi: {
+    center: [43.5855, 39.7231],
+    zoom: 12,
+    locations: [
+      { pos: [43.5855, 39.7231], name: 'Олимпийский парк', type: 'place', description: 'Олимпийские объекты', visitors: 3210 },
+      { pos: [43.5999, 39.7296], name: 'Морской вокзал', type: 'place', description: 'Центральный порт', visitors: 1567 },
+      { pos: [43.6406, 40.2110], name: 'Роза Хутор', type: 'place', description: 'Горнолыжный курорт', visitors: 4123 },
+    ],
+    cameras: [
+      { pos: [43.5865, 39.7240], name: 'Камера Сочи #1', status: 'online' },
+      { pos: [43.6000, 39.7300], name: 'Камера Сочи #2', status: 'online' },
+    ],
+    friends: [
+      { pos: [43.5900, 39.7260], name: 'Елена Морозова', status: 'онлайн' },
+    ]
+  },
+  ekb: {
+    center: [56.8389, 60.6057],
+    zoom: 13,
+    locations: [
+      { pos: [56.8389, 60.6057], name: 'Плотинка', type: 'place', description: 'Исторический центр', visitors: 1890 },
+      { pos: [56.8430, 60.6530], name: 'Ельцин Центр', type: 'place', description: 'Культурный центр', visitors: 2345 },
+      { pos: [56.8350, 60.5950], name: 'Арена Екатеринбург', type: 'place', description: 'Стадион', visitors: 3456 },
+    ],
+    cameras: [
+      { pos: [56.8395, 60.6060], name: 'Камера Екб #1', status: 'online' },
+      { pos: [56.8440, 60.6540], name: 'Камера Екб #2', status: 'online' },
+    ],
+    friends: [
+      { pos: [56.8400, 60.6100], name: 'Дмитрий Сидоров', status: 'онлайн' },
+    ]
+  }
+};
 
-  const locations = [
-    { 
-      pos: [55.7539, 37.6208] as [number, number], 
-      name: 'Красная площадь',
-      type: 'place',
-      description: 'Главная площадь Москвы',
-      visitors: 1234
-    },
-    { 
-      pos: [55.7558, 37.6173] as [number, number], 
-      name: 'ГУМ',
-      type: 'place',
-      description: 'Торговый центр',
-      visitors: 892
-    },
-    { 
-      pos: [55.7520, 37.6175] as [number, number], 
-      name: 'Кремль',
-      type: 'place',
-      description: 'Исторический комплекс',
-      visitors: 2341
-    },
-  ];
-
-  const cameras = [
-    { pos: [55.7540, 37.6200] as [number, number], name: 'Камера #1', status: 'online' },
-    { pos: [55.7565, 37.6180] as [number, number], name: 'Камера #2', status: 'online' },
-    { pos: [55.7530, 37.6190] as [number, number], name: 'Камера #3', status: 'online' },
-  ];
-
-  const friends = [
-    { pos: [55.7550, 37.6210] as [number, number], name: 'Анна Иванова', status: 'онлайн' },
-    { pos: [55.7545, 37.6165] as [number, number], name: 'Петр Смирнов', status: 'онлайн' },
-  ];
+const MapComponent = ({ onMarkerClick, city = 'moscow' }: MapComponentProps) => {
+  const data = cityData[city] || cityData.moscow;
+  const { center, zoom, locations, cameras, friends } = data;
 
   return (
     <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl">
       <MapContainer
-        center={moscowCenter}
-        zoom={15}
+        center={center}
+        zoom={zoom}
         style={{ height: '100%', width: '100%' }}
         zoomControl={true}
         scrollWheelZoom={true}
+        key={city}
       >
-        <MapUpdater center={moscowCenter} zoom={15} />
+        <MapUpdater center={center} zoom={zoom} />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
