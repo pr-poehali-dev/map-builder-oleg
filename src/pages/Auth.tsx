@@ -12,6 +12,7 @@ interface AuthProps {
 
 const Auth = ({ onComplete }: AuthProps) => {
   const { toast } = useToast();
+  const [mode, setMode] = useState<"login" | "register">("register");
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -21,15 +22,18 @@ const Auth = ({ onComplete }: AuthProps) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const validateRegistration = () => {
-    if (!formData.name || formData.name.trim().length < 2) {
-      toast({
-        title: "Ошибка",
-        description: "Введите ваше имя",
-        variant: "destructive",
-      });
-      return false;
+  const validateForm = () => {
+    if (mode === "register") {
+      if (!formData.name || formData.name.trim().length < 2) {
+        toast({
+          title: "Ошибка",
+          description: "Введите ваше имя",
+          variant: "destructive",
+        });
+        return false;
+      }
     }
+    
     if (!formData.phone || formData.phone.length < 10) {
       toast({
         title: "Ошибка",
@@ -44,28 +48,62 @@ const Auth = ({ onComplete }: AuthProps) => {
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
     
-    if (!validateRegistration()) return;
+    if (!validateForm()) return;
     
-    const nameParts = formData.name.trim().split(' ');
-    const firstName = nameParts[0] || '';
-    const lastName = nameParts[1] || '';
-    
-    const user = {
-      name: formData.name.trim(),
-      phone: formData.phone,
-      initials: lastName 
-        ? `${firstName[0]}${lastName[0]}`.toUpperCase()
-        : `${firstName[0]}${firstName[1] || ''}`.toUpperCase(),
-    };
-    
-    localStorage.setItem("userProfile", JSON.stringify(user));
-    
-    toast({
-      title: "Добро пожаловать!",
-      description: "Регистрация завершена",
-    });
-    
-    onComplete(user);
+    if (mode === "login") {
+      const savedProfile = localStorage.getItem("userProfile");
+      if (savedProfile) {
+        try {
+          const user = JSON.parse(savedProfile);
+          if (user.phone === formData.phone) {
+            onComplete(user);
+            toast({
+              title: "Добро пожаловать!",
+              description: `Рады видеть вас снова, ${user.name}`,
+            });
+          } else {
+            toast({
+              title: "Ошибка",
+              description: "Неверный номер телефона",
+              variant: "destructive",
+            });
+          }
+        } catch (error) {
+          toast({
+            title: "Ошибка",
+            description: "Пользователь не найден",
+            variant: "destructive",
+          });
+        }
+      } else {
+        toast({
+          title: "Ошибка",
+          description: "Аккаунт не найден. Зарегистрируйтесь!",
+          variant: "destructive",
+        });
+      }
+    } else {
+      const nameParts = formData.name.trim().split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts[1] || '';
+      
+      const user = {
+        name: formData.name.trim(),
+        phone: formData.phone,
+        initials: lastName 
+          ? `${firstName[0]}${lastName[0]}`.toUpperCase()
+          : `${firstName[0]}${firstName[1] || ''}`.toUpperCase(),
+      };
+      
+      localStorage.setItem("userProfile", JSON.stringify(user));
+      
+      toast({
+        title: "Добро пожаловать!",
+        description: "Регистрация завершена",
+      });
+      
+      onComplete(user);
+    }
   };
 
   return (
@@ -85,22 +123,24 @@ const Auth = ({ onComplete }: AuthProps) => {
             Вет Карты
           </h1>
           <p className="text-gray-500 mt-2">
-            Создайте аккаунт для продолжения
+            {mode === "register" ? "Создайте аккаунт для продолжения" : "Войдите в систему"}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <Label htmlFor="name">Ваше имя</Label>
-            <Input
-              id="name"
-              placeholder="Иван Иванов"
-              value={formData.name}
-              onChange={(e) => handleChange("name", e.target.value)}
-              className="mt-1"
-              autoFocus
-            />
-          </div>
+          {mode === "register" && (
+            <div>
+              <Label htmlFor="name">Ваше имя</Label>
+              <Input
+                id="name"
+                placeholder="Иван Иванов"
+                value={formData.name}
+                onChange={(e) => handleChange("name", e.target.value)}
+                className="mt-1"
+                autoFocus
+              />
+            </div>
+          )}
 
           <div>
             <Label htmlFor="phone">Номер телефона</Label>
@@ -111,6 +151,7 @@ const Auth = ({ onComplete }: AuthProps) => {
               value={formData.phone}
               onChange={(e) => handleChange("phone", e.target.value)}
               className="mt-1"
+              autoFocus={mode === "login"}
             />
           </div>
 
@@ -118,8 +159,25 @@ const Auth = ({ onComplete }: AuthProps) => {
             type="submit"
             className="w-full bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white font-semibold py-6 text-lg mt-6"
           >
-            Начать
+            {mode === "register" ? "Зарегистрироваться" : "Войти"}
           </Button>
+
+          <div className="text-center">
+            <button
+              type="button"
+              onClick={() => {
+                setMode(mode === "login" ? "register" : "login");
+                setFormData({ name: "", phone: "" });
+              }}
+              className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              {mode === "register" ? (
+                <span>Уже есть аккаунт? <span className="font-semibold text-blue-600">Войти</span></span>
+              ) : (
+                <span>Нет аккаунта? <span className="font-semibold text-green-600">Зарегистрироваться</span></span>
+              )}
+            </button>
+          </div>
         </form>
       </Card>
 

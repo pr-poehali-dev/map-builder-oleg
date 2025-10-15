@@ -29,9 +29,10 @@ import ProfileSection from "@/components/sections/ProfileSection";
 
 interface IndexProps {
   user?: any;
+  onLogout?: () => void;
 }
 
-const Index = ({ user }: IndexProps) => {
+const Index = ({ user, onLogout }: IndexProps) => {
   const { toast } = useToast();
   const [activeSection, setActiveSection] = useState<Section>("map");
   const [searchQuery, setSearchQuery] = useState("");
@@ -131,7 +132,7 @@ const Index = ({ user }: IndexProps) => {
       case "assistant":
         return <AssistantSection />;
       case "profile":
-        return <ProfileSection profile={profile} setProfile={setProfile} />;
+        return <ProfileSection profile={profile} setProfile={setProfile} onLogout={onLogout} />;
       default:
         return (
           <MapSection

@@ -9,9 +9,10 @@ import { Profile } from "./types";
 interface ProfileSectionProps {
   profile: Profile;
   setProfile: React.Dispatch<React.SetStateAction<Profile>>;
+  onLogout?: () => void;
 }
 
-const ProfileSection = ({ profile, setProfile }: ProfileSectionProps) => {
+const ProfileSection = ({ profile, setProfile, onLogout }: ProfileSectionProps) => {
   return (
     <div className="space-y-4 animate-fade-in">
       <Card className="p-6 bg-gradient-to-br from-primary/10 to-secondary/10">
@@ -98,7 +99,9 @@ const ProfileSection = ({ profile, setProfile }: ProfileSectionProps) => {
           className="w-full mt-4 h-12"
           onClick={() => {
             localStorage.removeItem('userProfile');
-            window.location.reload();
+            if (onLogout) {
+              onLogout();
+            }
           }}
         >
           <Icon name="LogOut" size={20} className="mr-2" />

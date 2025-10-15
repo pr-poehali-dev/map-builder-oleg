@@ -32,6 +32,11 @@ const App = () => {
     setIsAuthenticated(true);
   };
 
+  const handleLogout = () => {
+    setUser(null);
+    setIsAuthenticated(false);
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -42,7 +47,7 @@ const App = () => {
             <Auth onComplete={handleAuthComplete} />
           ) : (
             <Routes>
-              <Route path="/" element={<Index user={user} />} />
+              <Route path="/" element={<Index user={user} onLogout={handleLogout} />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           )}
