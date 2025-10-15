@@ -29,10 +29,11 @@ import ProfileSection from "@/components/sections/ProfileSection";
 
 interface IndexProps {
   user?: any;
+  onLogin?: (user: any) => void;
   onLogout?: () => void;
 }
 
-const Index = ({ user, onLogout }: IndexProps) => {
+const Index = ({ user, onLogin, onLogout }: IndexProps) => {
   const { toast } = useToast();
   const [activeSection, setActiveSection] = useState<Section>("map");
   const [searchQuery, setSearchQuery] = useState("");
@@ -132,7 +133,7 @@ const Index = ({ user, onLogout }: IndexProps) => {
       case "assistant":
         return <AssistantSection />;
       case "profile":
-        return <ProfileSection profile={profile} setProfile={setProfile} onLogout={onLogout} />;
+        return <ProfileSection profile={profile} setProfile={setProfile} onLogin={onLogin} onLogout={onLogout} isGuest={!user} />;
       default:
         return (
           <MapSection
@@ -170,6 +171,16 @@ const Index = ({ user, onLogout }: IndexProps) => {
                 className="pl-10 w-64 bg-gray-50"
               />
             </div>
+            {!user && (
+              <Button 
+                variant="outline"
+                onClick={() => setActiveSection("profile")}
+                className="gap-2"
+              >
+                <Icon name="User" size={18} />
+                Войти
+              </Button>
+            )}
             <Dialog open={isHotlineOpen} onOpenChange={setIsHotlineOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white font-semibold gap-2">

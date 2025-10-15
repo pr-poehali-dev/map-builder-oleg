@@ -4,14 +4,12 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Auth from "./pages/Auth";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
@@ -20,21 +18,20 @@ const App = () => {
       try {
         const profile = JSON.parse(savedProfile);
         setUser(profile);
-        setIsAuthenticated(true);
       } catch (error) {
         // Error loading profile
       }
     }
   }, []);
 
-  const handleAuthComplete = (userData: any) => {
+  const handleLogin = (userData: any) => {
     setUser(userData);
-    setIsAuthenticated(true);
+    localStorage.setItem("userProfile", JSON.stringify(userData));
   };
 
   const handleLogout = () => {
     setUser(null);
-    setIsAuthenticated(false);
+    localStorage.removeItem("userProfile");
   };
 
   return (
@@ -43,14 +40,10 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          {!isAuthenticated ? (
-            <Auth onComplete={handleAuthComplete} />
-          ) : (
-            <Routes>
-              <Route path="/" element={<Index user={user} onLogout={handleLogout} />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          )}
+          <Routes>
+            <Route path="/" element={<Index user={user} onLogin={handleLogin} onLogout={handleLogout} />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

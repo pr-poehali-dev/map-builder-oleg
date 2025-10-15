@@ -1,18 +1,191 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import Icon from "@/components/ui/icon";
+import { useToast } from "@/components/ui/use-toast";
 import { Profile } from "./types";
 
 interface ProfileSectionProps {
   profile: Profile;
   setProfile: React.Dispatch<React.SetStateAction<Profile>>;
+  onLogin?: (user: any) => void;
   onLogout?: () => void;
+  isGuest?: boolean;
 }
 
-const ProfileSection = ({ profile, setProfile, onLogout }: ProfileSectionProps) => {
+const ProfileSection = ({ profile, setProfile, onLogin, onLogout, isGuest }: ProfileSectionProps) => {
+  const { toast } = useToast();
+  const [mode, setMode] = useState<"login" | "register">("register");
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+  });
+
+  const handleChange = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const validateForm = () => {
+    if (mode === "register") {
+      if (!formData.name || formData.name.trim().length < 2) {
+        toast({
+          title: "Ошибка",
+          description: "Введите ваше имя",
+          variant: "destructive",
+        });
+        return false;
+      }
+    }
+    
+    if (!formData.phone || formData.phone.length < 10) {
+      toast({
+        title: "Ошибка",
+        description: "Введите корректный номер телефона",
+        variant: "destructive",
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    
+    if (!validateForm()) return;
+    
+    if (mode === "login") {
+      const savedProfile = localStorage.getItem("userProfile");
+      if (savedProfile) {
+        try {
+          const user = JSON.parse(savedProfile);
+          if (user.phone === formData.phone) {
+            if (onLogin) {
+              onLogin(user);
+            }
+            toast({
+              title: "Добро пожаловать!",
+              description: `Рады видеть вас снова, ${user.name}`,
+            });
+          } else {
+            toast({
+              title: "Ошибка",
+              description: "Неверный номер телефона",
+              variant: "destructive",
+            });
+          }
+        } catch (error) {
+          toast({
+            title: "Ошибка",
+            description: "Пользователь не найден",
+            variant: "destructive",
+          });
+        }
+      } else {
+        toast({
+          title: "Ошибка",
+          description: "Аккаунт не найден. Зарегистрируйтесь!",
+          variant: "destructive",
+        });
+      }
+    } else {
+      const nameParts = formData.name.trim().split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts[1] || '';
+      
+      const user = {
+        name: formData.name.trim(),
+        phone: formData.phone,
+        initials: lastName 
+          ? `${firstName[0]}${lastName[0]}`.toUpperCase()
+          : `${firstName[0]}${firstName[1] || ''}`.toUpperCase(),
+      };
+      
+      if (onLogin) {
+        onLogin(user);
+      }
+      
+      toast({
+        title: "Добро пожаловать!",
+        description: "Регистрация завершена",
+      });
+    }
+  };
+
+  if (isGuest) {
+    return (
+      <div className="space-y-4 animate-fade-in max-w-md mx-auto">
+        <Card className="p-8">
+          <div className="text-center mb-6">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-green-500 rounded-2xl mb-4">
+              <Icon name="User" size={32} className="text-white" />
+            </div>
+            <h2 className="text-2xl font-bold">Профиль</h2>
+            <p className="text-gray-500 mt-2">
+              {mode === "register" ? "Создайте аккаунт" : "Войдите в систему"}
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {mode === "register" && (
+              <div>
+                <Label htmlFor="name">Ваше имя</Label>
+                <Input
+                  id="name"
+                  placeholder="Иван Иванов"
+                  value={formData.name}
+                  onChange={(e) => handleChange("name", e.target.value)}
+                  className="mt-1"
+                  autoFocus
+                />
+              </div>
+            )}
+
+            <div>
+              <Label htmlFor="phone">Номер телефона</Label>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="+7 (999) 123-45-67"
+                value={formData.phone}
+                onChange={(e) => handleChange("phone", e.target.value)}
+                className="mt-1"
+                autoFocus={mode === "login"}
+              />
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white font-semibold py-6 text-lg"
+            >
+              {mode === "register" ? "Зарегистрироваться" : "Войти"}
+            </Button>
+
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setMode(mode === "login" ? "register" : "login");
+                  setFormData({ name: "", phone: "" });
+                }}
+                className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                {mode === "register" ? (
+                  <span>Уже есть аккаунт? <span className="font-semibold text-blue-600">Войти</span></span>
+                ) : (
+                  <span>Нет аккаунта? <span className="font-semibold text-green-600">Зарегистрироваться</span></span>
+                )}
+              </button>
+            </div>
+          </form>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4 animate-fade-in">
       <Card className="p-6 bg-gradient-to-br from-primary/10 to-secondary/10">
@@ -98,7 +271,6 @@ const ProfileSection = ({ profile, setProfile, onLogout }: ProfileSectionProps) 
           variant="destructive" 
           className="w-full mt-4 h-12"
           onClick={() => {
-            localStorage.removeItem('userProfile');
             if (onLogout) {
               onLogout();
             }
