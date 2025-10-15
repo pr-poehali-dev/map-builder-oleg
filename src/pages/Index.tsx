@@ -75,7 +75,7 @@ const Index = ({ user }: IndexProps) => {
         initials: user.initials
       }));
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     localStorage.setItem('vetkarty_profile', JSON.stringify({ friends: profile.friends }));
