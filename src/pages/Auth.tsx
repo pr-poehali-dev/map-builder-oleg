@@ -12,14 +12,9 @@ interface AuthProps {
 
 const Auth = ({ onComplete }: AuthProps) => {
   const { toast } = useToast();
-  const [step, setStep] = useState<"login" | "register">("login");
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
+    name: "",
     phone: "",
-    password: "",
-    confirmPassword: "",
   });
 
   const handleChange = (field: string, value: string) => {
@@ -27,18 +22,10 @@ const Auth = ({ onComplete }: AuthProps) => {
   };
 
   const validateRegistration = () => {
-    if (!formData.firstName || !formData.lastName) {
+    if (!formData.name || formData.name.trim().length < 2) {
       toast({
         title: "Ошибка",
-        description: "Введите имя и фамилию",
-        variant: "destructive",
-      });
-      return false;
-    }
-    if (!formData.email || !formData.email.includes("@")) {
-      toast({
-        title: "Ошибка",
-        description: "Введите корректный email",
+        description: "Введите ваше имя",
         variant: "destructive",
       });
       return false;
@@ -51,71 +38,34 @@ const Auth = ({ onComplete }: AuthProps) => {
       });
       return false;
     }
-    if (!formData.password || formData.password.length < 6) {
-      toast({
-        title: "Ошибка",
-        description: "Пароль должен быть не менее 6 символов",
-        variant: "destructive",
-      });
-      return false;
-    }
-    if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: "Ошибка",
-        description: "Пароли не совпадают",
-        variant: "destructive",
-      });
-      return false;
-    }
     return true;
   };
 
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (step === "register") {
-      if (!validateRegistration()) return;
-      
-      const user = {
-        name: `${formData.firstName} ${formData.lastName}`,
-        email: formData.email,
-        phone: formData.phone,
-        initials: `${formData.firstName[0]}${formData.lastName[0]}`.toUpperCase(),
-      };
-      
-      localStorage.setItem("userProfile", JSON.stringify(user));
-      
-      toast({
-        title: "Успешно!",
-        description: "Регистрация завершена",
-      });
-      
-      onComplete(user);
-    } else {
-      if (!formData.email || !formData.password) {
-        toast({
-          title: "Ошибка",
-          description: "Введите email и пароль",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      const savedProfile = localStorage.getItem("userProfile");
-      if (savedProfile) {
-        const user = JSON.parse(savedProfile);
-        onComplete(user);
-        toast({
-          title: "Добро пожаловать!",
-          description: "Вход выполнен успешно",
-        });
-      } else {
-        toast({
-          title: "Ошибка",
-          description: "Пользователь не найден. Зарегистрируйтесь!",
-          variant: "destructive",
-        });
-      }
-    }
+    
+    if (!validateRegistration()) return;
+    
+    const nameParts = formData.name.trim().split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts[1] || '';
+    
+    const user = {
+      name: formData.name.trim(),
+      phone: formData.phone,
+      initials: lastName 
+        ? `${firstName[0]}${lastName[0]}`.toUpperCase()
+        : `${firstName[0]}${firstName[1] || ''}`.toUpperCase(),
+    };
+    
+    localStorage.setItem("userProfile", JSON.stringify(user));
+    
+    toast({
+      title: "Добро пожаловать!",
+      description: "Регистрация завершена",
+    });
+    
+    onComplete(user);
   };
 
   return (
@@ -135,132 +85,41 @@ const Auth = ({ onComplete }: AuthProps) => {
             Вет Карты
           </h1>
           <p className="text-gray-500 mt-2">
-            {step === "register" ? "Создайте аккаунт" : "Войдите в систему"}
+            Создайте аккаунт для продолжения
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {step === "register" ? (
-            <>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <Label htmlFor="firstName">Имя</Label>
-                  <Input
-                    id="firstName"
-                    placeholder="Иван"
-                    value={formData.firstName}
-                    onChange={(e) => handleChange("firstName", e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="lastName">Фамилия</Label>
-                  <Input
-                    id="lastName"
-                    placeholder="Иванов"
-                    value={formData.lastName}
-                    onChange={(e) => handleChange("lastName", e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
-              </div>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <Label htmlFor="name">Ваше имя</Label>
+            <Input
+              id="name"
+              placeholder="Иван Иванов"
+              value={formData.name}
+              onChange={(e) => handleChange("name", e.target.value)}
+              className="mt-1"
+              autoFocus
+            />
+          </div>
 
-              <div>
-                <Label htmlFor="email">Электронная почта</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="ivan@example.com"
-                  value={formData.email}
-                  onChange={(e) => handleChange("email", e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="phone">Номер телефона</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="+7 (999) 123-45-67"
-                  value={formData.phone}
-                  onChange={(e) => handleChange("phone", e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="password">Придумайте пароль</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Минимум 6 символов"
-                  value={formData.password}
-                  onChange={(e) => handleChange("password", e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="confirmPassword">Повторите пароль</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  placeholder="Введите пароль еще раз"
-                  value={formData.confirmPassword}
-                  onChange={(e) => handleChange("confirmPassword", e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-            </>
-          ) : (
-            <>
-              <div>
-                <Label htmlFor="email">Электронная почта</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="ivan@example.com"
-                  value={formData.email}
-                  onChange={(e) => handleChange("email", e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="password">Пароль</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Введите пароль"
-                  value={formData.password}
-                  onChange={(e) => handleChange("password", e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-            </>
-          )}
+          <div>
+            <Label htmlFor="phone">Номер телефона</Label>
+            <Input
+              id="phone"
+              type="tel"
+              placeholder="+7 (999) 123-45-67"
+              value={formData.phone}
+              onChange={(e) => handleChange("phone", e.target.value)}
+              className="mt-1"
+            />
+          </div>
 
           <Button
             type="submit"
-            className="w-full bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white font-semibold py-6 text-lg"
+            className="w-full bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white font-semibold py-6 text-lg mt-6"
           >
-            {step === "register" ? "Зарегистрироваться" : "Войти"}
+            Начать
           </Button>
-
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={() => setStep(step === "login" ? "register" : "login")}
-              className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              {step === "register" ? (
-                <span>Уже есть аккаунт? <span className="font-semibold text-blue-600">Войти</span></span>
-              ) : (
-                <span>Нет аккаунта? <span className="font-semibold text-green-600">Зарегистрироваться</span></span>
-              )}
-            </button>
-          </div>
         </form>
       </Card>
 
