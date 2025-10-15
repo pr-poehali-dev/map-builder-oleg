@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import Icon from "@/components/ui/icon";
-import MapComponent from "@/components/MapComponent";
+// import MapComponent from "@/components/MapComponent";
 import { useToast } from "@/components/ui/use-toast";
 import { Profile, Section } from "./types";
 
@@ -28,7 +28,13 @@ const MapSection = ({
 
   return (
     <div className="relative w-full h-[calc(100vh-12rem)]">
-      <MapComponent onMarkerClick={handleMarkerClick} city={selectedCity} />
+      <div className="w-full h-full bg-gradient-to-br from-blue-100 to-green-100 rounded-2xl flex items-center justify-center">
+        <div className="text-center">
+          <Icon name="Map" size={64} className="mx-auto mb-4 text-primary opacity-50" />
+          <p className="text-gray-600 text-lg">Карта временно недоступна</p>
+        </div>
+      </div>
+      {/* <MapComponent onMarkerClick={handleMarkerClick} city={selectedCity} /> */}
       
       <div className="absolute top-4 left-4 space-y-3 z-[1000] pointer-events-auto">
         <Card className="p-4 backdrop-blur-sm bg-white/95 shadow-lg animate-slide-in">
