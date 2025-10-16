@@ -348,6 +348,21 @@ const Index = ({ user, onLogin, onLogout }: IndexProps) => {
                   </Button>
                 ))}
                 <div className="mt-4 pt-4 border-t space-y-2">
+                  <div className="mb-4">
+                    <h3 className="font-semibold mb-2 px-4 text-sm text-gray-600">Выбор города</h3>
+                    {cities.map((city) => (
+                      <Button
+                        key={city.id}
+                        variant={selectedCity === city.id ? "default" : "ghost"}
+                        className="w-full justify-start"
+                        onClick={() => setSelectedCity(city.id)}
+                      >
+                        <Icon name={city.icon as any} size={18} className="mr-3" />
+                        {city.name}
+                      </Button>
+                    ))}
+                  </div>
+                  
                   <Button
                     variant="outline"
                     className="w-full justify-start text-red-600 border-red-200 hover:bg-red-50"

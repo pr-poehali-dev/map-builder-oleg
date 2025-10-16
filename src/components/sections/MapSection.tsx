@@ -34,27 +34,9 @@ const MapSection = ({
         <Card className="p-4 backdrop-blur-sm bg-white/95 shadow-lg animate-slide-in">
           <div className="flex items-center gap-2 mb-3">
             <Icon name="MapPin" size={20} className="text-primary" />
-            <span className="font-semibold">Выберите город</span>
+            <span className="font-semibold">{cities.find(c => c.id === selectedCity)?.name || "Город"}</span>
           </div>
-          <div className="grid grid-cols-1 gap-2">
-            {cities.map((city) => (
-              <Button
-                key={city.id}
-                variant={selectedCity === city.id ? "default" : "outline"}
-                size="sm"
-                className={`justify-start transition-all ${
-                  selectedCity === city.id 
-                    ? "bg-gradient-to-r from-primary to-secondary text-white shadow-md" 
-                    : "hover:border-primary"
-                }`}
-                onClick={() => setSelectedCity(city.id)}
-              >
-                <Icon name={city.icon as any} size={16} className="mr-2" />
-                {city.name}
-              </Button>
-            ))}
-          </div>
-          <div className="flex gap-2 mt-3">
+          <div className="flex gap-2">
             <Badge className="bg-green-500">Онлайн</Badge>
             <Badge variant="outline">{profile.friends.length} друзей</Badge>
           </div>
