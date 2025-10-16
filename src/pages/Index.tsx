@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { Section, Profile } from "@/components/sections/types";
 import MapSection from "@/components/sections/MapSection";
+import SocialSection from "@/components/sections/SocialSection";
 import CamerasSection from "@/components/sections/CamerasSection";
 import FriendsSection from "@/components/sections/FriendsSection";
 import RoutesSection from "@/components/sections/RoutesSection";
@@ -87,8 +88,9 @@ const Index = ({ user, onLogin, onLogout }: IndexProps) => {
 
   const menuItems = [
     { id: "map" as Section, label: "Карта", icon: "Map" },
+    { id: "social" as Section, label: "Соцсеть", icon: "Users" },
     { id: "cameras" as Section, label: "Камеры", icon: "Video" },
-    { id: "friends" as Section, label: "Друзья", icon: "Users" },
+    { id: "friends" as Section, label: "Друзья", icon: "UserPlus" },
     { id: "routes" as Section, label: "Маршруты", icon: "Route" },
     { id: "assistant" as Section, label: "Олег", icon: "MessageSquare" },
     { id: "profile" as Section, label: "Профиль", icon: "User" },
@@ -126,6 +128,8 @@ const Index = ({ user, onLogin, onLogout }: IndexProps) => {
             handleMarkerClick={handleMarkerClick}
           />
         );
+      case "social":
+        return <SocialSection profile={profile} />;
       case "cameras":
         return <CamerasSection />;
       case "friends":

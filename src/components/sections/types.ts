@@ -1,4 +1,4 @@
-export type Section = "map" | "cameras" | "friends" | "routes" | "assistant" | "profile";
+export type Section = "map" | "social" | "cameras" | "friends" | "routes" | "assistant" | "profile";
 
 export interface Friend {
   id: string;
