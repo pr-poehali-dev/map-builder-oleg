@@ -254,6 +254,37 @@ const ProfileSection = ({ profile, setProfile, onLogin, onLogout, isGuest }: Pro
         </div>
       </Card>
 
+      <Card className="p-6 bg-gradient-to-br from-blue-50 to-purple-50">
+        <h3 className="font-semibold text-xl mb-4 flex items-center gap-2">
+          <Icon name="Zap" size={24} className="text-blue-600" />
+          Быстрые команды
+        </h3>
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          {[
+            { label: "Экстренный вызов", icon: "AlertCircle", color: "from-red-500 to-orange-500" },
+            { label: "Голосовой помощник", icon: "Mic", color: "from-blue-500 to-purple-500" },
+            { label: "Поделиться локацией", icon: "MapPin", color: "from-green-500 to-teal-500" },
+            { label: "Запись с камеры", icon: "Video", color: "from-indigo-500 to-blue-500" },
+            { label: "Найти друга", icon: "UserSearch", color: "from-pink-500 to-rose-500" },
+            { label: "Безопасный маршрут", icon: "Route", color: "from-emerald-500 to-green-600" },
+          ].map((item, i) => (
+            <Button
+              key={i}
+              className={`h-24 flex-col gap-2 bg-gradient-to-br ${item.color} text-white hover:scale-105 transition-all shadow-lg`}
+              onClick={() => {
+                toast({
+                  title: item.label,
+                  description: "Команда активирована",
+                });
+              }}
+            >
+              <Icon name={item.icon as any} size={24} />
+              <span className="text-xs font-semibold">{item.label}</span>
+            </Button>
+          ))}
+        </div>
+      </Card>
+
       <Card className="p-6">
         <h3 className="font-semibold text-xl mb-4">Настройки</h3>
         <div className="space-y-3">

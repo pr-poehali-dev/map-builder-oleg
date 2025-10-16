@@ -1,16 +1,25 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Icon from "@/components/ui/icon";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const CamerasSection = () => {
+  const [selectedCamera, setSelectedCamera] = useState<any>(null);
+  
   const cameras = [
-    { id: 1, name: "Красная площадь", location: "Москва, центр", status: "online", viewers: 1234 },
-    { id: 2, name: "Невский проспект", location: "Санкт-Петербург", status: "online", viewers: 892 },
-    { id: 3, name: "Казанский Кремль", location: "Казань", status: "online", viewers: 456 },
-    { id: 4, name: "Олимпийский парк", location: "Сочи", status: "offline", viewers: 0 },
-    { id: 5, name: "Плотинка", location: "Екатеринбург", status: "online", viewers: 678 },
-    { id: 6, name: "Набережная", location: "Москва", status: "online", viewers: 2341 },
+    { id: 1, name: "Красная площадь", location: "Москва, центр", status: "online", viewers: 1234, stream: "live1" },
+    { id: 2, name: "Невский проспект", location: "Санкт-Петербург", status: "online", viewers: 892, stream: "live2" },
+    { id: 3, name: "Казанский Кремль", location: "Казань", status: "online", viewers: 456, stream: "live3" },
+    { id: 4, name: "Олимпийский парк", location: "Сочи", status: "offline", viewers: 0, stream: null },
+    { id: 5, name: "Плотинка", location: "Екатеринбург", status: "online", viewers: 678, stream: "live4" },
+    { id: 6, name: "Набережная", location: "Москва", status: "online", viewers: 2341, stream: "live5" },
   ];
 
   return (
@@ -27,7 +36,7 @@ const CamerasSection = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {cameras.map((camera) => (
-          <Card key={camera.id} className="overflow-hidden hover:shadow-xl transition-all hover:scale-105 cursor-pointer">
+          <Card key={camera.id} className="overflow-hidden hover:shadow-xl transition-all hover:scale-105 cursor-pointer" onClick={() => camera.status === 'online' && setSelectedCamera(camera)}>
             <div className="h-40 bg-gradient-to-br from-blue-400 via-purple-400 to-pink-400 flex items-center justify-center relative group">
               <Icon name="Video" size={48} className="text-white opacity-50 group-hover:opacity-100 transition-opacity" />
               {camera.status === 'online' ? (
@@ -61,6 +70,56 @@ const CamerasSection = () => {
           </Card>
         ))}
       </div>
+
+      <Dialog open={!!selectedCamera} onOpenChange={() => setSelectedCamera(null)}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Icon name="Video" size={24} className="text-primary" />
+              {selectedCamera?.name}
+              <Badge className="ml-2 bg-red-500 animate-pulse flex items-center gap-1">
+                <div className="w-2 h-2 rounded-full bg-white"></div>
+                LIVE
+              </Badge>
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="aspect-video bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-lg flex items-center justify-center relative overflow-hidden">
+              <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                <Icon name="Video" size={64} className="text-white opacity-50" />
+              </div>
+              <div className="absolute top-4 right-4 bg-black/70 px-3 py-2 rounded text-white text-sm flex items-center gap-2">
+                <Icon name="Eye" size={16} />
+                {selectedCamera?.viewers} смотрят
+              </div>
+              <div className="absolute top-4 left-4 bg-red-500 px-3 py-2 rounded text-white text-sm font-semibold animate-pulse flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+                Прямой эфир
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                <p className="text-white text-sm flex items-center gap-2">
+                  <Icon name="MapPin" size={16} />
+                  {selectedCamera?.location}
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button className="flex-1" variant="outline">
+                <Icon name="Download" size={18} className="mr-2" />
+                Скачать запись
+              </Button>
+              <Button className="flex-1" variant="outline">
+                <Icon name="Share2" size={18} className="mr-2" />
+                Поделиться
+              </Button>
+              <Button className="flex-1" variant="outline">
+                <Icon name="Bell" size={18} className="mr-2" />
+                Уведомления
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Card className="p-6 mt-6 bg-gradient-to-br from-blue-50 to-purple-50">
         <div className="flex items-start gap-4">
