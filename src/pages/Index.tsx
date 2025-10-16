@@ -331,12 +331,14 @@ const Index = ({ user, onLogin, onLogout }: IndexProps) => {
                 <Icon name="Menu" size={24} />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-64">
-              <SheetHeader>
-                <SheetTitle>Меню</SheetTitle>
+            <SheetContent side="right" className="w-80 flex flex-col p-0">
+              <SheetHeader className="px-6 py-4 border-b">
+                <SheetTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                  Главное меню
+                </SheetTitle>
               </SheetHeader>
               
-              <nav className="flex flex-col gap-2 mt-6">
+              <nav className="flex flex-col gap-2 mt-4 px-4 overflow-y-auto flex-1 pb-4">
                 {menuItems.map((item) => (
                   <Button
                     key={item.id}
@@ -349,7 +351,7 @@ const Index = ({ user, onLogin, onLogout }: IndexProps) => {
                   </Button>
                 ))}
                 
-                <div className="mt-4 pt-4 border-t space-y-2">
+                <div className="mt-2 pt-4 border-t space-y-3">
                   <div className="p-3 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg border border-blue-200">
                     <div className="flex items-center gap-2 mb-2">
                       <Icon name="MapPin" size={18} className="text-primary" />
@@ -361,8 +363,8 @@ const Index = ({ user, onLogin, onLogout }: IndexProps) => {
                     </div>
                   </div>
                   
-                  <div className="mb-4">
-                    <h3 className="font-semibold mb-2 px-4 text-sm text-gray-600">Выбор города</h3>
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-sm text-gray-600 px-2">Выбор города</h3>
                     {cities.map((city) => (
                       <Button
                         key={city.id}
@@ -375,35 +377,108 @@ const Index = ({ user, onLogin, onLogout }: IndexProps) => {
                       </Button>
                     ))}
                   </div>
-                  
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-red-600 border-red-200 hover:bg-red-50"
-                    onClick={() => {
-                      setIsVoiceCallOpen(true);
-                    }}
-                  >
-                    <Icon name="PhoneCall" size={20} className="mr-3" />
-                    Горячая линия
-                  </Button>
-                  <a
-                    href="https://play.google.com/store/apps"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 rounded-md transition-colors"
-                  >
-                    <Icon name="Smartphone" size={20} />
-                    Google Play
-                  </a>
-                  <a
-                    href="https://apps.apple.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 rounded-md transition-colors"
-                  >
-                    <Icon name="Smartphone" size={20} />
-                    App Store
-                  </a>
+
+                  <div className="space-y-2 pt-3 border-t">
+                    <h3 className="font-semibold text-sm text-gray-600 px-2">Быстрые действия</h3>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start border-red-200 text-red-600 hover:bg-red-50"
+                      onClick={() => setIsVoiceCallOpen(true)}
+                    >
+                      <Icon name="PhoneCall" size={20} className="mr-3" />
+                      Горячая линия
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start border-orange-200 text-orange-600 hover:bg-orange-50"
+                      onClick={() => toast({ title: "SOS", description: "Экстренный вызов активирован" })}
+                    >
+                      <Icon name="AlertCircle" size={20} className="mr-3" />
+                      Экстренный вызов
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start"
+                      onClick={() => setActiveSection("assistant")}
+                    >
+                      <Icon name="Mic" size={20} className="mr-3" />
+                      Голосовой помощник
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start"
+                      onClick={() => toast({ title: "Местоположение", description: "Ваша локация отправлена" })}
+                    >
+                      <Icon name="Navigation" size={20} className="mr-3" />
+                      Поделиться локацией
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start"
+                      onClick={() => setActiveSection("cameras")}
+                    >
+                      <Icon name="Video" size={20} className="mr-3" />
+                      Камеры рядом
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start"
+                      onClick={() => toast({ title: "История", description: "Открываю историю перемещений" })}
+                    >
+                      <Icon name="History" size={20} className="mr-3" />
+                      История перемещений
+                    </Button>
+                  </div>
+
+                  <div className="space-y-2 pt-3 border-t">
+                    <h3 className="font-semibold text-sm text-gray-600 px-2">Настройки</h3>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start"
+                      onClick={() => toast({ title: "Уведомления", description: "Настройки уведомлений" })}
+                    >
+                      <Icon name="Bell" size={20} className="mr-3" />
+                      Уведомления
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start"
+                      onClick={() => toast({ title: "Конфиденциальность", description: "Настройки приватности" })}
+                    >
+                      <Icon name="Shield" size={20} className="mr-3" />
+                      Конфиденциальность
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start"
+                      onClick={() => toast({ title: "Помощь", description: "Справочный центр" })}
+                    >
+                      <Icon name="HelpCircle" size={20} className="mr-3" />
+                      Помощь и поддержка
+                    </Button>
+                  </div>
+
+                  <div className="space-y-2 pt-3 border-t">
+                    <h3 className="font-semibold text-sm text-gray-600 px-2">Скачать приложение</h3>
+                    <a
+                      href="https://play.google.com/store/apps"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 rounded-md transition-colors border border-gray-200"
+                    >
+                      <Icon name="Smartphone" size={20} className="text-green-600" />
+                      <span className="font-medium">Google Play</span>
+                    </a>
+                    <a
+                      href="https://apps.apple.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 rounded-md transition-colors border border-gray-200"
+                    >
+                      <Icon name="Smartphone" size={20} className="text-blue-600" />
+                      <span className="font-medium">App Store</span>
+                    </a>
+                  </div>
                 </div>
               </nav>
             </SheetContent>
