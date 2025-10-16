@@ -96,22 +96,28 @@ const ProfileSection = ({ profile, setProfile, onLogin, onLogout, isGuest }: Pro
       const firstName = nameParts[0] || '';
       const lastName = nameParts[1] || '';
       
-      const user = {
+      const newUser = {
         name: formData.name.trim(),
         phone: formData.phone,
+        email: `${formData.phone}@vetkarty.ru`,
         initials: lastName 
           ? `${firstName[0]}${lastName[0]}`.toUpperCase()
           : `${firstName[0]}${firstName[1] || ''}`.toUpperCase(),
+        friends: [],
       };
       
+      setProfile(newUser);
+      
       if (onLogin) {
-        onLogin(user);
+        onLogin(newUser);
       }
       
       toast({
         title: "Добро пожаловать!",
         description: "Регистрация завершена",
       });
+      
+      setFormData({ name: "", phone: "" });
     }
   };
 

@@ -26,6 +26,7 @@ import FriendsSection from "@/components/sections/FriendsSection";
 import RoutesSection from "@/components/sections/RoutesSection";
 import AssistantSection from "@/components/sections/AssistantSection";
 import ProfileSection from "@/components/sections/ProfileSection";
+import VoiceCallDialog from "@/components/VoiceCallDialog";
 
 interface IndexProps {
   user?: any;
@@ -44,6 +45,7 @@ const Index = ({ user, onLogin, onLogout }: IndexProps) => {
     friends: []
   });
   const [isHotlineOpen, setIsHotlineOpen] = useState(false);
+  const [isVoiceCallOpen, setIsVoiceCallOpen] = useState(false);
   const [selectedCity, setSelectedCity] = useState("moscow");
 
   const cities = useMemo(() => [
@@ -153,12 +155,34 @@ const Index = ({ user, onLogin, onLogout }: IndexProps) => {
       <header className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-gray-100">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center">
-              <Icon name="Map" size={24} className="text-white" />
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center">
+                <Icon name="Map" size={24} className="text-white" />
+              </div>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                Вет Карты
+              </h1>
             </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              Вет Карты
-            </h1>
+            <div className="flex items-center gap-2 ml-4">
+              <a
+                href="https://play.google.com/store/apps"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-3 py-1.5 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors text-sm"
+              >
+                <Icon name="Smartphone" size={16} />
+                <span className="hidden lg:inline">Google Play</span>
+              </a>
+              <a
+                href="https://apps.apple.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-3 py-1.5 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors text-sm"
+              >
+                <Icon name="Smartphone" size={16} />
+                <span className="hidden lg:inline">App Store</span>
+              </a>
+            </div>
           </div>
 
           <div className="hidden md:flex items-center gap-2">
@@ -210,6 +234,19 @@ const Index = ({ user, onLogin, onLogout }: IndexProps) => {
                       </div>
                     </div>
                     <div className="space-y-3">
+                      <button
+                        onClick={() => {
+                          setIsHotlineOpen(false);
+                          setIsVoiceCallOpen(true);
+                        }}
+                        className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-green-500 to-blue-500 text-white rounded-lg hover:shadow-lg transition-all"
+                      >
+                        <Icon name="PhoneCall" size={20} />
+                        <div className="text-left">
+                          <p className="font-semibold">Позвонить с сайта</p>
+                          <p className="text-sm text-white/90">Голосовой звонок прямо сейчас</p>
+                        </div>
+                      </button>
                       <a href="tel:88005553535" className="flex items-center gap-3 p-3 bg-white rounded-lg hover:shadow-md transition-all">
                         <Icon name="Phone" size={20} className="text-red-500" />
                         <div>
@@ -306,6 +343,36 @@ const Index = ({ user, onLogin, onLogout }: IndexProps) => {
                     {item.label}
                   </Button>
                 ))}
+                <div className="mt-4 pt-4 border-t space-y-2">
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start text-red-600 border-red-200 hover:bg-red-50"
+                    onClick={() => {
+                      setIsVoiceCallOpen(true);
+                    }}
+                  >
+                    <Icon name="PhoneCall" size={20} className="mr-3" />
+                    Горячая линия
+                  </Button>
+                  <a
+                    href="https://play.google.com/store/apps"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 rounded-md transition-colors"
+                  >
+                    <Icon name="Smartphone" size={20} />
+                    Google Play
+                  </a>
+                  <a
+                    href="https://apps.apple.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 rounded-md transition-colors"
+                  >
+                    <Icon name="Smartphone" size={20} />
+                    App Store
+                  </a>
+                </div>
               </nav>
             </SheetContent>
           </Sheet>
@@ -339,6 +406,11 @@ const Index = ({ user, onLogin, onLogout }: IndexProps) => {
           {renderContent()}
         </main>
       </div>
+
+      <VoiceCallDialog 
+        open={isVoiceCallOpen} 
+        onOpenChange={setIsVoiceCallOpen}
+      />
     </div>
   );
 };
