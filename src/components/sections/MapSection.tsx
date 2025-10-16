@@ -30,29 +30,9 @@ const MapSection = ({
     <div className="relative w-full h-[calc(100vh-12rem)]">
       <MapComponent onMarkerClick={handleMarkerClick} city={selectedCity} />
       
-      <div className="absolute top-4 left-4 space-y-3 z-[1000] pointer-events-auto">
-        <Card className="p-4 backdrop-blur-sm bg-white/95 shadow-lg animate-slide-in">
-          <div className="flex items-center gap-2 mb-3">
-            <Icon name="MapPin" size={20} className="text-primary" />
-            <span className="font-semibold">{cities.find(c => c.id === selectedCity)?.name || "Город"}</span>
-          </div>
-          <div className="flex gap-2">
-            <Badge className="bg-green-500">Онлайн</Badge>
-            <Badge variant="outline">{profile.friends.length} друзей</Badge>
-          </div>
-        </Card>
-
-        <Card className="p-3 backdrop-blur-sm bg-white/95 shadow-lg animate-slide-in" style={{animationDelay: '0.1s'}}>
-          <div className="flex items-center gap-2 mb-2">
-            <Icon name="Video" size={20} className="text-secondary" />
-            <span className="font-semibold text-sm">12 камер</span>
-          </div>
-          <p className="text-xs text-gray-600">в пределах 5 км</p>
-        </Card>
-
-        {profile.friends.length > 0 && (
+      {profile.friends.length > 0 && (
+        <div className="absolute top-4 left-4 z-[1000] pointer-events-auto">
           <Card className="p-3 backdrop-blur-sm bg-white/95 shadow-lg animate-slide-in cursor-pointer hover:shadow-xl transition-all" 
-                style={{animationDelay: '0.2s'}}
                 onClick={() => setActiveSection("friends")}>
             <div className="flex items-center gap-2 mb-2">
               <div className="relative">
@@ -79,8 +59,8 @@ const MapSection = ({
               )}
             </div>
           </Card>
-        )}
-      </div>
+        </div>
+      )}
 
       <div className="absolute bottom-4 right-4 z-[1000] flex flex-col gap-3">
         <Button 

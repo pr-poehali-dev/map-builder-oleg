@@ -336,17 +336,6 @@ const Index = ({ user, onLogin, onLogout }: IndexProps) => {
                 <SheetTitle>Меню</SheetTitle>
               </SheetHeader>
               
-              <div className="mt-4 p-3 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg border border-blue-200">
-                <div className="flex items-center gap-2 mb-2">
-                  <Icon name="MapPin" size={18} className="text-primary" />
-                  <span className="font-semibold text-sm">{cities.find(c => c.id === selectedCity)?.name || "Москва"}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Icon name="Video" size={18} className="text-secondary" />
-                  <span className="text-sm text-gray-700">12 камер активны</span>
-                </div>
-              </div>
-
               <nav className="flex flex-col gap-2 mt-6">
                 {menuItems.map((item) => (
                   <Button
@@ -359,7 +348,19 @@ const Index = ({ user, onLogin, onLogout }: IndexProps) => {
                     {item.label}
                   </Button>
                 ))}
+                
                 <div className="mt-4 pt-4 border-t space-y-2">
+                  <div className="p-3 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg border border-blue-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Icon name="MapPin" size={18} className="text-primary" />
+                      <span className="font-semibold text-sm">{cities.find(c => c.id === selectedCity)?.name || "Москва"}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Icon name="Video" size={18} className="text-secondary" />
+                      <span className="text-sm text-gray-700">12 камер активны</span>
+                    </div>
+                  </div>
+                  
                   <div className="mb-4">
                     <h3 className="font-semibold mb-2 px-4 text-sm text-gray-600">Выбор города</h3>
                     {cities.map((city) => (
